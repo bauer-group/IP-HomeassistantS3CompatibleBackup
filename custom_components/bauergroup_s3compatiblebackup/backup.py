@@ -19,7 +19,14 @@ from homeassistant.components.backup import (
 from homeassistant.core import HomeAssistant, callback
 
 from . import S3ConfigEntry
-from .const import CONF_BUCKET, DATA_BACKUP_AGENT_LISTENERS, DOMAIN
+from .const import (
+    BACKUP_FOLDER,
+    CONF_BUCKET,
+    CONF_PREFIX,
+    DATA_BACKUP_AGENT_LISTENERS,
+    DEFAULT_PREFIX,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 CACHE_TTL = 300
@@ -95,10 +102,37 @@ class S3BackupAgent(BackupAgent):
         super().__init__()
         self._client = entry.runtime_data
         self._bucket: str = entry.data[CONF_BUCKET]
+        self._prefix: str = self._build_prefix(entry.data.get(CONF_PREFIX, DEFAULT_PREFIX))
         self.name = entry.title
         self.unique_id = entry.entry_id
         self._backup_cache: dict[str, AgentBackup] = {}
         self._cache_expiration = time()
+
+    def _build_prefix(self, prefix: str) -> str:
+        """Build the full prefix path for backups.
+
+        Args:
+            prefix: The user-configured prefix (e.g., 'homeassistant')
+
+        Returns:
+            Full prefix path (e.g., 'homeassistant/backups/')
+        """
+        # Remove leading/trailing slashes from prefix
+        prefix = prefix.strip("/")
+        if prefix:
+            return f"{prefix}/{BACKUP_FOLDER}/"
+        return f"{BACKUP_FOLDER}/"
+
+    def _get_key(self, filename: str) -> str:
+        """Get the full S3 key for a file.
+
+        Args:
+            filename: The filename (e.g., 'backup.tar')
+
+        Returns:
+            Full S3 key (e.g., 'homeassistant/backups/backup.tar')
+        """
+        return f"{self._prefix}{filename}"
 
     @handle_boto_errors
     async def async_download_backup(
@@ -114,7 +148,9 @@ class S3BackupAgent(BackupAgent):
         backup = await self._find_backup_by_id(backup_id)
         tar_filename, _ = suggested_filenames(backup)
 
-        response = await self._client.get_object(Bucket=self._bucket, Key=tar_filename)
+        response = await self._client.get_object(
+            Bucket=self._bucket, Key=self._get_key(tar_filename)
+        )
         return response["Body"].iter_chunks()
 
     async def async_upload_backup(
@@ -130,18 +166,20 @@ class S3BackupAgent(BackupAgent):
         :param backup: Metadata about the backup that should be uploaded.
         """
         tar_filename, metadata_filename = suggested_filenames(backup)
+        tar_key = self._get_key(tar_filename)
+        metadata_key = self._get_key(metadata_filename)
 
         try:
             if backup.size < MULTIPART_MIN_PART_SIZE_BYTES:
-                await self._upload_simple(tar_filename, open_stream)
+                await self._upload_simple(tar_key, open_stream)
             else:
-                await self._upload_multipart(tar_filename, open_stream)
+                await self._upload_multipart(tar_key, open_stream)
 
             # Upload the metadata file
             metadata_content = json.dumps(backup.as_dict())
             await self._client.put_object(
                 Bucket=self._bucket,
-                Key=metadata_filename,
+                Key=metadata_key,
                 Body=metadata_content,
             )
         except BotoCoreError as err:
@@ -152,15 +190,15 @@ class S3BackupAgent(BackupAgent):
 
     async def _upload_simple(
         self,
-        tar_filename: str,
+        key: str,
         open_stream: Callable[[], Coroutine[Any, Any, AsyncIterator[bytes]]],
     ) -> None:
         """Upload a small file using simple upload.
 
-        :param tar_filename: The target filename for the backup.
+        :param key: The full S3 key for the backup.
         :param open_stream: A function returning an async iterator that yields bytes.
         """
-        _LOGGER.debug("Starting simple upload for %s", tar_filename)
+        _LOGGER.debug("Starting simple upload for %s", key)
         stream = await open_stream()
         file_data = bytearray()
         async for chunk in stream:
@@ -168,24 +206,24 @@ class S3BackupAgent(BackupAgent):
 
         await self._client.put_object(
             Bucket=self._bucket,
-            Key=tar_filename,
+            Key=key,
             Body=bytes(file_data),
         )
 
     async def _upload_multipart(
         self,
-        tar_filename: str,
+        key: str,
         open_stream: Callable[[], Coroutine[Any, Any, AsyncIterator[bytes]]],
     ) -> None:
         """Upload a large file using multipart upload.
 
-        :param tar_filename: The target filename for the backup.
+        :param key: The full S3 key for the backup.
         :param open_stream: A function returning an async iterator that yields bytes.
         """
-        _LOGGER.debug("Starting multipart upload for %s", tar_filename)
+        _LOGGER.debug("Starting multipart upload for %s", key)
         multipart_upload = await self._client.create_multipart_upload(
             Bucket=self._bucket,
-            Key=tar_filename,
+            Key=key,
         )
         upload_id = multipart_upload["UploadId"]
         try:
@@ -206,7 +244,7 @@ class S3BackupAgent(BackupAgent):
                     )
                     part = await self._client.upload_part(
                         Bucket=self._bucket,
-                        Key=tar_filename,
+                        Key=key,
                         PartNumber=part_number,
                         UploadId=upload_id,
                         Body=b"".join(buffer),
@@ -223,7 +261,7 @@ class S3BackupAgent(BackupAgent):
                 )
                 part = await self._client.upload_part(
                     Bucket=self._bucket,
-                    Key=tar_filename,
+                    Key=key,
                     PartNumber=part_number,
                     UploadId=upload_id,
                     Body=b"".join(buffer),
@@ -232,7 +270,7 @@ class S3BackupAgent(BackupAgent):
 
             await self._client.complete_multipart_upload(
                 Bucket=self._bucket,
-                Key=tar_filename,
+                Key=key,
                 UploadId=upload_id,
                 MultipartUpload={"Parts": parts},
             )
@@ -241,7 +279,7 @@ class S3BackupAgent(BackupAgent):
             try:
                 await self._client.abort_multipart_upload(
                     Bucket=self._bucket,
-                    Key=tar_filename,
+                    Key=key,
                     UploadId=upload_id,
                 )
             except BotoCoreError:

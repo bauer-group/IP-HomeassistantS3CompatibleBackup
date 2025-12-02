@@ -20,8 +20,10 @@ from .const import (
     CONF_ACCESS_KEY_ID,
     CONF_BUCKET,
     CONF_ENDPOINT_URL,
+    CONF_PREFIX,
     CONF_REGION,
     CONF_SECRET_ACCESS_KEY,
+    DEFAULT_PREFIX,
     DEFAULT_REGION,
     DOMAIN,
 )
@@ -37,6 +39,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
             config=TextSelectorConfig(type=TextSelectorType.URL)
         ),
         vol.Required(CONF_REGION, default=DEFAULT_REGION): cv.string,
+        vol.Optional(CONF_PREFIX, default=DEFAULT_PREFIX): cv.string,
     }
 )
 

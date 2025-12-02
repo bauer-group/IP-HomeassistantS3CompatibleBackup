@@ -12,8 +12,11 @@ CONF_SECRET_ACCESS_KEY = "secret_access_key"
 CONF_ENDPOINT_URL = "endpoint_url"
 CONF_BUCKET = "bucket"
 CONF_REGION = "region"
+CONF_PREFIX = "prefix"
 
 DEFAULT_REGION = "us-east-1"
+DEFAULT_PREFIX = "homeassistant"
+BACKUP_FOLDER = "backups"
 
 DATA_BACKUP_AGENT_LISTENERS: HassKey[list[Callable[[], None]]] = HassKey(
     f"{DOMAIN}.backup_agent_listeners"
