@@ -11,7 +11,7 @@ from botocore.exceptions import ClientError, ConnectionError, ParamValidationErr
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryError, ConfigEntryNotReady
 
 from .const import (
     CONF_ACCESS_KEY_ID,
@@ -48,7 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: S3CompatibleConfigEntry)
         ).__aenter__()
         await client.head_bucket(Bucket=data[CONF_BUCKET])
     except ClientError as err:
-        raise ConfigEntryError(
+        raise ConfigEntryAuthFailed(
             translation_domain=DOMAIN,
             translation_key="invalid_credentials",
         ) from err

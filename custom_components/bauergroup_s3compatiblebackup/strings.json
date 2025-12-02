@@ -20,6 +20,38 @@
           "region": "The region of your S3 compatible storage (e.g., us-east-1, eu-central-1).",
           "prefix": "The root folder for backups in the bucket. Backups will be stored in {prefix}/backups/. Default: homeassistant"
         }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate S3 Storage",
+        "description": "The credentials for {bucket} are no longer valid. Please provide new credentials.",
+        "data": {
+          "access_key_id": "Access Key ID",
+          "secret_access_key": "Secret Access Key"
+        },
+        "data_description": {
+          "access_key_id": "The new access key ID for your S3 compatible storage.",
+          "secret_access_key": "The new secret access key for your S3 compatible storage."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure S3 Storage",
+        "description": "Update the configuration for your S3 compatible storage.",
+        "data": {
+          "access_key_id": "Access Key ID",
+          "secret_access_key": "Secret Access Key",
+          "bucket": "Bucket Name",
+          "endpoint_url": "Endpoint URL",
+          "region": "Region",
+          "prefix": "Storage Prefix"
+        },
+        "data_description": {
+          "access_key_id": "The access key ID for your S3 compatible storage.",
+          "secret_access_key": "The secret access key for your S3 compatible storage.",
+          "bucket": "The bucket name where backups will be stored. The bucket must already exist and be writable.",
+          "endpoint_url": "The endpoint URL of your S3 compatible storage (e.g., https://s3.eu-central-1.amazonaws.com or https://your-minio-server:9000).",
+          "region": "The region of your S3 compatible storage (e.g., us-east-1, eu-central-1).",
+          "prefix": "The root folder for backups in the bucket. Backups will be stored in {prefix}/backups/. Default: homeassistant"
+        }
       }
     },
     "error": {
@@ -29,7 +61,8 @@
       "invalid_endpoint_url": "Invalid endpoint URL. Please provide a valid URL."
     },
     "abort": {
-      "already_configured": "This bucket and endpoint combination is already configured."
+      "already_configured": "This bucket and endpoint combination is already configured.",
+      "reauth_successful": "Re-authentication was successful."
     }
   },
   "exceptions": {
