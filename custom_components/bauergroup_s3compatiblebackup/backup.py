@@ -18,7 +18,7 @@ from homeassistant.components.backup import (
 )
 from homeassistant.core import HomeAssistant, callback
 
-from . import S3ConfigEntry
+from . import S3CompatibleConfigEntry
 from .const import (
     BACKUP_FOLDER,
     CONF_BUCKET,
@@ -59,8 +59,8 @@ async def async_get_backup_agents(
     hass: HomeAssistant,
 ) -> list[BackupAgent]:
     """Return a list of backup agents."""
-    entries: list[S3ConfigEntry] = hass.config_entries.async_loaded_entries(DOMAIN)
-    return [S3BackupAgent(hass, entry) for entry in entries]
+    entries: list[S3CompatibleConfigEntry] = hass.config_entries.async_loaded_entries(DOMAIN)
+    return [S3CompatibleBackupAgent(hass, entry) for entry in entries]
 
 
 @callback
@@ -92,12 +92,12 @@ def suggested_filenames(backup: AgentBackup) -> tuple[str, str]:
     return f"{base_name}.tar", f"{base_name}.metadata.json"
 
 
-class S3BackupAgent(BackupAgent):
+class S3CompatibleBackupAgent(BackupAgent):
     """Backup agent for S3 compatible storage."""
 
     domain = DOMAIN
 
-    def __init__(self, hass: HomeAssistant, entry: S3ConfigEntry) -> None:
+    def __init__(self, hass: HomeAssistant, entry: S3CompatibleConfigEntry) -> None:
         """Initialize the S3 backup agent."""
         super().__init__()
         self._client = entry.runtime_data
@@ -298,10 +298,12 @@ class S3BackupAgent(BackupAgent):
         """
         backup = await self._find_backup_by_id(backup_id)
         tar_filename, metadata_filename = suggested_filenames(backup)
+        tar_key = self._get_key(tar_filename)
+        metadata_key = self._get_key(metadata_filename)
 
         # Delete both the backup file and its metadata file
-        await self._client.delete_object(Bucket=self._bucket, Key=tar_filename)
-        await self._client.delete_object(Bucket=self._bucket, Key=metadata_filename)
+        await self._client.delete_object(Bucket=self._bucket, Key=tar_key)
+        await self._client.delete_object(Bucket=self._bucket, Key=metadata_key)
 
         # Reset cache after successful deletion
         self._cache_expiration = time()
@@ -337,9 +339,12 @@ class S3BackupAgent(BackupAgent):
         backups = {}
         continuation_token: str | None = None
 
-        # Paginate through all objects in the bucket
+        # Paginate through all objects in the bucket with prefix filter
         while True:
-            list_kwargs: dict[str, Any] = {"Bucket": self._bucket}
+            list_kwargs: dict[str, Any] = {
+                "Bucket": self._bucket,
+                "Prefix": self._prefix,
+            }
             if continuation_token:
                 list_kwargs["ContinuationToken"] = continuation_token
 

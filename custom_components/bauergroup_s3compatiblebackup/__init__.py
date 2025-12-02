@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import cast
 
-from aiobotocore.client import AioBaseClient as S3Client
+from aiobotocore.client import AioBaseClient as BotoClient
 from aiobotocore.session import AioSession
 from botocore.exceptions import ClientError, ConnectionError, ParamValidationError
 
@@ -24,13 +24,13 @@ from .const import (
     DOMAIN,
 )
 
-type S3ConfigEntry = ConfigEntry[S3Client]
+type S3CompatibleConfigEntry = ConfigEntry[BotoClient]
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: S3ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: S3CompatibleConfigEntry) -> bool:
     """Set up S3 Compatible Backup from a config entry."""
 
     data = cast(dict, entry.data)
@@ -81,7 +81,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: S3ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: S3ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: S3CompatibleConfigEntry) -> bool:
     """Unload a config entry."""
     client = entry.runtime_data
     await client.__aexit__(None, None, None)

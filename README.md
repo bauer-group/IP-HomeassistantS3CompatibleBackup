@@ -71,6 +71,7 @@ Then restart Home Assistant.
 | **Bucket Name** | Target bucket (must exist) | `my-ha-backups` |
 | **Endpoint URL** | S3-compatible endpoint | `https://s3.eu-central-1.amazonaws.com` |
 | **Region** | Storage region | `eu-central-1` |
+| **Storage Prefix** | Root folder for backups (optional) | `homeassistant` |
 
 ---
 
@@ -85,10 +86,28 @@ Once configured, the integration automatically appears as a backup location in H
 
 ### Backup Structure
 
-Backups are stored with two files per backup:
+Backups are organized in a folder structure within your bucket:
+
+```
+my-bucket/
+└── homeassistant/           # Storage Prefix (configurable)
+    └── backups/             # Fixed subfolder
+        ├── Home_Assistant_2025-12-02.tar
+        ├── Home_Assistant_2025-12-02.metadata.json
+        ├── Home_Assistant_2025-12-01.tar
+        ├── Home_Assistant_2025-12-01.metadata.json
+        └── ...
+```
+
+Each backup consists of two files:
 
 - `{backup-name}.tar` - The actual backup archive
 - `{backup-name}.metadata.json` - Backup metadata for Home Assistant
+
+The **Storage Prefix** allows you to:
+- Keep backups separate from other data in the same bucket
+- Run multiple Home Assistant instances with different prefixes
+- Share a bucket across different applications
 
 ---
 

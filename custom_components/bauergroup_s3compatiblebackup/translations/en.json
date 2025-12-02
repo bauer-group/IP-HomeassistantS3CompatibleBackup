@@ -9,14 +9,16 @@
           "secret_access_key": "Secret Access Key",
           "bucket": "Bucket Name",
           "endpoint_url": "Endpoint URL",
-          "region": "Region"
+          "region": "Region",
+          "prefix": "Storage Prefix"
         },
         "data_description": {
           "access_key_id": "The access key ID for your S3 compatible storage.",
           "secret_access_key": "The secret access key for your S3 compatible storage.",
           "bucket": "The bucket name where backups will be stored. The bucket must already exist and be writable.",
           "endpoint_url": "The endpoint URL of your S3 compatible storage (e.g., https://s3.eu-central-1.amazonaws.com or https://your-minio-server:9000).",
-          "region": "The region of your S3 compatible storage (e.g., us-east-1, eu-central-1)."
+          "region": "The region of your S3 compatible storage (e.g., us-east-1, eu-central-1).",
+          "prefix": "The root folder for backups in the bucket. Backups will be stored in {prefix}/backups/. Default: homeassistant"
         }
       }
     },

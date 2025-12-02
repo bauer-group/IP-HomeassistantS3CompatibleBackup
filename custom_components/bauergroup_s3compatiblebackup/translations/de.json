@@ -9,14 +9,16 @@
           "secret_access_key": "Secret Access Key",
           "bucket": "Bucket-Name",
           "endpoint_url": "Endpoint-URL",
-          "region": "Region"
+          "region": "Region",
+          "prefix": "Speicher-Präfix"
         },
         "data_description": {
           "access_key_id": "Die Access Key ID für Ihren S3-kompatiblen Speicher.",
           "secret_access_key": "Der Secret Access Key für Ihren S3-kompatiblen Speicher.",
           "bucket": "Der Bucket-Name, in dem Backups gespeichert werden. Der Bucket muss bereits existieren und beschreibbar sein.",
           "endpoint_url": "Die Endpoint-URL Ihres S3-kompatiblen Speichers (z.B. https://s3.eu-central-1.amazonaws.com oder https://ihr-minio-server:9000).",
-          "region": "Die Region Ihres S3-kompatiblen Speichers (z.B. us-east-1, eu-central-1)."
+          "region": "Die Region Ihres S3-kompatiblen Speichers (z.B. us-east-1, eu-central-1).",
+          "prefix": "Der Stammordner für Backups im Bucket. Backups werden unter {prefix}/backups/ gespeichert. Standard: homeassistant"
         }
       }
     },
