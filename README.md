@@ -1,5 +1,7 @@
 # S3 Compatible Backup for Home Assistant
 
+*[Deutsche Version](README_DE.md)*
+
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Compatible-blue?style=for-the-badge&logo=home-assistant)](https://www.home-assistant.io/)
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![License](https://img.shields.io/github/license/bauer-group/IP-HomeassistantS3CompatibleBackup?style=for-the-badge)](LICENSE)
@@ -639,7 +641,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 🤝 Contributing
 
 Contributions are welcome! Please open an issue or pull request.
-
----
-
-*[Deutsche Version](README_DE.md)*
