@@ -22,6 +22,22 @@ This integration extends Home Assistant's built-in backup functionality to suppo
 
 ---
 
+## 🚀 Quick Start
+
+1. **Install** via HACS or manually (see [Installation](#-installation))
+2. **Restart Home Assistant**
+3. **Settings** → **Devices & Services** → **Add Integration**
+4. Search for **"BAUERGROUP - S3 Compatible Backup"**
+5. Enter your credentials:
+   - Access Key ID
+   - Secret Access Key
+   - Bucket Name (must already exist!)
+   - Endpoint URL
+   - Region
+6. **Settings** → **System** → **Backups** → Select your S3 storage as backup location
+
+---
+
 ## ✨ Features
 
 - 📦 **Full backup support** - Upload, download, list, and delete backups
@@ -31,6 +47,8 @@ This integration extends Home Assistant's built-in backup functionality to suppo
 - 🔐 **Secure** - Uses access credentials (Access Key ID + Secret Access Key)
 - 🚀 **Async** - Non-blocking operations using aiobotocore
 - 💾 **Caching** - Efficient backup listing with 5-minute cache
+- 🔑 **Re-Authentication** - Automatic prompt when credentials expire
+- ⚙️ **Reconfigure** - Change settings without removing the integration
 
 ---
 
@@ -110,6 +128,28 @@ The **Storage Prefix** allows you to:
 - Keep backups separate from other data in the same bucket
 - Run multiple Home Assistant instances with different prefixes
 - Share a bucket across different applications
+
+---
+
+## 🔧 Integration Management
+
+### Reconfigure (Change Settings)
+
+If you need to change your S3 configuration (bucket, endpoint, credentials, etc.):
+
+1. Go to **Settings** → **Devices & Services**
+2. Find **BAUERGROUP - S3 Compatible Backup**
+3. Click the **⋮** menu → **Reconfigure**
+4. Update your settings and save
+
+### Re-Authentication
+
+If your credentials expire or become invalid, Home Assistant will automatically prompt you to re-authenticate:
+
+1. You'll see a notification that authentication failed
+2. Click the notification or go to **Settings** → **Devices & Services**
+3. Click **Reconfigure** on the integration
+4. Enter your new Access Key ID and Secret Access Key
 
 ---
 
@@ -600,3 +640,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 Contributions are welcome! Please open an issue or pull request.
 
+---
+
+*[Deutsche Version](README_DE.md)*
