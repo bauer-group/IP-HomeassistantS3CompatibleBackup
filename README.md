@@ -3,6 +3,8 @@
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Compatible-blue?style=for-the-badge&logo=home-assistant)](https://www.home-assistant.io/)
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![License](https://img.shields.io/github/license/bauer-group/IP-HomeassistantS3CompatibleBackup?style=for-the-badge)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/bauer-group/IP-HomeassistantS3CompatibleBackup?style=for-the-badge)](https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/bauer-group/IP-HomeassistantS3CompatibleBackup?style=for-the-badge)](https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/issues)
 
 **Backup your Home Assistant to any S3-compatible storage provider.**
 
