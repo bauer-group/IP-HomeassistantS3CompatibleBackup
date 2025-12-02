@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Release automation script for BAUERGROUP Hargassner Integration.
+Release automation script for BAUERGROUP S3 Compatible Backup Integration.
 
 This script automates the release process by:
 1. Validating version format
@@ -479,7 +479,7 @@ def create_release(version: str, push: bool = True, github_release: bool = True)
 def main() -> None:
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Release automation script for BAUERGROUP Hargassner Integration",
+        description="Release automation script for BAUERGROUP S3 Compatible Backup Integration",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

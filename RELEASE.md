@@ -1,6 +1,6 @@
 # Release Process
 
-Dieses Dokument beschreibt den automatisierten Release-Prozess für die BAUERGROUP Hargassner Integration.
+Dieses Dokument beschreibt den automatisierten Release-Prozess für die BAUERGROUP S3 Compatible Backup Integration.
 
 ## Voraussetzungen
 
@@ -158,7 +158,7 @@ Falls `gh` nicht verfügbar ist, wird ein Link zum manuellen Erstellen angezeigt
 
 1. Öffne HACS in Home Assistant
 2. Gehe zu "Integrationen"
-3. Suche nach "BAUERGROUP Hargassner"
+3. Suche nach "S3 Compatible Backup"
 4. Prüfe ob neue Version angezeigt wird
 5. Teste Installation/Update
 
