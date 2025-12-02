@@ -600,6 +600,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 Contributions are welcome! Please open an issue or pull request.
 
-## 🙏 Credits
-
-Based on the [AWS S3 integration](https://github.com/home-assistant/core/tree/dev/homeassistant/components/aws_s3) from Home Assistant Core, extended to support any S3-compatible storage provider.
