@@ -1,0 +1,47 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "S3 Speicher Konfiguration",
+        "description": "Konfigurieren Sie Ihren S3-kompatiblen Speicher für Backups. Dies funktioniert mit jedem S3-kompatiblen Speicheranbieter (AWS S3, MinIO, Wasabi, Backblaze B2, etc.).",
+        "data": {
+          "access_key_id": "Access Key ID",
+          "secret_access_key": "Secret Access Key",
+          "bucket": "Bucket-Name",
+          "endpoint_url": "Endpoint-URL",
+          "region": "Region"
+        },
+        "data_description": {
+          "access_key_id": "Die Access Key ID für Ihren S3-kompatiblen Speicher.",
+          "secret_access_key": "Der Secret Access Key für Ihren S3-kompatiblen Speicher.",
+          "bucket": "Der Bucket-Name, in dem Backups gespeichert werden. Der Bucket muss bereits existieren und beschreibbar sein.",
+          "endpoint_url": "Die Endpoint-URL Ihres S3-kompatiblen Speichers (z.B. https://s3.eu-central-1.amazonaws.com oder https://ihr-minio-server:9000).",
+          "region": "Die Region Ihres S3-kompatiblen Speichers (z.B. us-east-1, eu-central-1)."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum S3-Endpoint fehlgeschlagen. Bitte überprüfen Sie die Endpoint-URL und Ihre Netzwerkverbindung.",
+      "invalid_bucket_name": "Ungültiger Bucket-Name. Bitte überprüfen Sie das Format des Bucket-Namens.",
+      "invalid_credentials": "Ungültige Anmeldedaten. Auf den Bucket kann mit der angegebenen Access Key ID und dem Secret Access Key nicht zugegriffen werden.",
+      "invalid_endpoint_url": "Ungültige Endpoint-URL. Bitte geben Sie eine gültige URL an."
+    },
+    "abort": {
+      "already_configured": "Diese Bucket- und Endpoint-Kombination ist bereits konfiguriert."
+    }
+  },
+  "exceptions": {
+    "cannot_connect": {
+      "message": "Verbindung zum S3-Endpoint fehlgeschlagen."
+    },
+    "invalid_bucket_name": {
+      "message": "Ungültiger Bucket-Name."
+    },
+    "invalid_credentials": {
+      "message": "Ungültige Anmeldedaten für den S3-Bucket."
+    },
+    "invalid_endpoint_url": {
+      "message": "Ungültige Endpoint-URL."
+    }
+  }
+}

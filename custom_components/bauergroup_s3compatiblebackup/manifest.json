@@ -1,0 +1,14 @@
+{
+  "domain": "bauergroup_s3compatiblebackup",
+  "name": "BAUERGROUP - S3 Compatible Backup",
+  "codeowners": ["@bauer-group"],
+  "config_flow": true,
+  "dependencies": ["backup"],
+  "documentation": "https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup",
+  "integration_type": "service",
+  "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/issues",
+  "requirements": ["aiobotocore==2.21.1"],
+  "quality_scale": "silver",
+  "version": "0.1.0"
+}
