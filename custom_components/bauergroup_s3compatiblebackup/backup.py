@@ -297,32 +297,46 @@ class S3BackupAgent(BackupAgent):
             return self._backup_cache
 
         backups = {}
-        response = await self._client.list_objects_v2(Bucket=self._bucket)
+        continuation_token: str | None = None
 
-        # Filter for metadata files only
-        metadata_files = [
-            obj
-            for obj in response.get("Contents", [])
-            if obj["Key"].endswith(".metadata.json")
-        ]
+        # Paginate through all objects in the bucket
+        while True:
+            list_kwargs: dict[str, Any] = {"Bucket": self._bucket}
+            if continuation_token:
+                list_kwargs["ContinuationToken"] = continuation_token
 
-        for metadata_file in metadata_files:
-            try:
-                # Download and parse metadata file
-                metadata_response = await self._client.get_object(
-                    Bucket=self._bucket, Key=metadata_file["Key"]
-                )
-                metadata_content = await metadata_response["Body"].read()
-                metadata_json = json.loads(metadata_content)
-            except (BotoCoreError, json.JSONDecodeError) as err:
-                _LOGGER.warning(
-                    "Failed to process metadata file %s: %s",
-                    metadata_file["Key"],
-                    err,
-                )
-                continue
-            backup = AgentBackup.from_dict(metadata_json)
-            backups[backup.backup_id] = backup
+            response = await self._client.list_objects_v2(**list_kwargs)
+
+            # Filter for metadata files only
+            metadata_files = [
+                obj
+                for obj in response.get("Contents", [])
+                if obj["Key"].endswith(".metadata.json")
+            ]
+
+            for metadata_file in metadata_files:
+                try:
+                    # Download and parse metadata file
+                    metadata_response = await self._client.get_object(
+                        Bucket=self._bucket, Key=metadata_file["Key"]
+                    )
+                    metadata_content = await metadata_response["Body"].read()
+                    metadata_json = json.loads(metadata_content)
+                except (BotoCoreError, json.JSONDecodeError) as err:
+                    _LOGGER.warning(
+                        "Failed to process metadata file %s: %s",
+                        metadata_file["Key"],
+                        err,
+                    )
+                    continue
+                backup = AgentBackup.from_dict(metadata_json)
+                backups[backup.backup_id] = backup
+
+            # Check if there are more pages
+            if response.get("IsTruncated"):
+                continuation_token = response.get("NextContinuationToken")
+            else:
+                break
 
         self._backup_cache = backups
         self._cache_expiration = time() + CACHE_TTL

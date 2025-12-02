@@ -36,6 +36,8 @@ This integration extends Home Assistant's built-in backup functionality to suppo
 
 ### Method 1: HACS (Recommended)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bauer-group&repository=IP-HomeassistantS3CompatibleBackup&category=integration)
+
 1. Open **HACS** in Home Assistant
 2. Go to **Integrations**
 3. Click the **⋮** menu → **Custom repositories**
