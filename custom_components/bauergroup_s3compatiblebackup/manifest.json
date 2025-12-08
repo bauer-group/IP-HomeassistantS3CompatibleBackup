@@ -14,7 +14,7 @@
   "issue_tracker": "https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/issues",
   "quality_scale": "silver",
   "requirements": [
-    "aiobotocore==2.26.0"
+    "aiobotocore>=2.6.0,<3.0.0"
   ],
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
