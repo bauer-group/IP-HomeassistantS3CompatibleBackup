@@ -19,6 +19,7 @@ This integration extends Home Assistant's built-in backup functionality to suppo
 - 🌊 **DigitalOcean Spaces**
 - ☁️ **Cloudflare R2**
 - 🏢 **Synology C2 Object Storage**
+- 🚗 **Garage** (distributed self-hosted)
 - 🖥️ **Self-hosted S3-compatible storage**
 - And any other S3-compatible provider!
 
@@ -463,6 +464,73 @@ Cloudflare R2 is an S3-compatible object storage with zero egress fees.
 
 ---
 
+### 🚗 Garage (Self-hosted Distributed Storage)
+
+[Garage](https://garagehq.deuxfleurs.fr/) is a lightweight, self-hosted, geo-distributed storage system with S3-compatible API. It's designed for self-hosting and small-scale deployments.
+
+#### 1. Install Garage
+
+**Docker:**
+
+```bash
+docker run -d \
+  --name garage \
+  -p 3900:3900 \
+  -p 3901:3901 \
+  -p 3902:3902 \
+  -v /path/to/garage/data:/var/lib/garage/data \
+  -v /path/to/garage/meta:/var/lib/garage/meta \
+  -v /path/to/garage.toml:/etc/garage.toml \
+  dxflrs/garage:latest
+```
+
+**Docker Compose:**
+
+```yaml
+version: '3.8'
+services:
+  garage:
+    image: dxflrs/garage:latest
+    container_name: garage
+    ports:
+      - "3900:3900"  # S3 API
+      - "3901:3901"  # RPC
+      - "3902:3902"  # Web/Admin
+    volumes:
+      - ./garage/data:/var/lib/garage/data
+      - ./garage/meta:/var/lib/garage/meta
+      - ./garage.toml:/etc/garage.toml
+```
+
+#### 2. Create Bucket and Access Key (Garage)
+
+```bash
+# Create a bucket
+garage bucket create homeassistant-backups
+
+# Create an API key
+garage key create homeassistant-backup-key
+
+# Grant permissions to the bucket
+garage bucket allow homeassistant-backups --read --write --key homeassistant-backup-key
+```
+
+#### 3. Configuration in Home Assistant (Garage)
+
+| Field | Value |
+|-------|-------|
+| Access Key ID | `GK...` (your Garage key ID) |
+| Secret Access Key | `...` (your Garage secret key) |
+| Bucket Name | `homeassistant-backups` |
+| Endpoint URL | `http://your-garage-server:3900` |
+| Region | `garage` |
+
+> **Important:** The region **must** be set to `garage` (or whatever region is configured in your `garage.toml`). Using a different region (like `us-east-1`) will result in an "invalid_credentials" error with the message: `Authorization header malformed, unexpected scope`.
+>
+> If you see errors like `unexpected scope: 20251215/us-east-1/s3/aws4_request`, change the region from `us-east-1` to `garage`.
+
+---
+
 ### 🏢 Synology C2 Object Storage
 
 Synology C2 offers S3-compatible cloud storage.
@@ -629,6 +697,7 @@ rm test.txt test-download.txt
 | Cloudflare R2 | 10 GB | No | No | Yes |
 | DigitalOcean Spaces | No | Yes | $5/month | Yes |
 | MinIO | Self-hosted | N/A | N/A | Yes |
+| Garage | Self-hosted | N/A | N/A | Yes |
 
 ---
 
