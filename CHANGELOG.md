@@ -66,7 +66,7 @@ Erste Version der S3 Compatible Backup Integration für Home Assistant.
 
 ### 🔧 Technical
 
-- Abhängigkeit: `aiobotocore==2.26.0`
+- Abhängigkeit: `aiobotocore>=2.6.0,<3.0.0`
 
 ---
 
