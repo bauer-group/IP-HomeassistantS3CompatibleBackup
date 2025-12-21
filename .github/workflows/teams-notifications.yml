@@ -1,0 +1,46 @@
+name: 📢 Teams Notifications
+
+on:
+  push:
+    branches: [main]
+
+  pull_request:
+    branches: [main]
+    types: [opened, closed, reopened]
+
+  release:
+    types: [published, prereleased]
+
+  issues:
+    types: [opened, closed, reopened]
+  workflow_run:
+    workflows: ["*"]
+    types: [completed]
+
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "Custom message to send"
+        required: true
+        type: string
+      channel:
+        description: "Teams channel (webhook name)"
+        required: false
+        type: string
+        default: "general"
+
+  workflow_call:
+    inputs:
+      notification-level:
+        description: "Notification level (all or errors-only)"
+        required: false
+        type: string
+        default: "errors-only"
+
+jobs:
+  notify-teams:
+    name: Send Teams Notification
+    uses: bauer-group/automation-templates/.github/workflows/teams-notifications.yml@main
+    with:
+      notification-level: ${{ inputs.notification-level || 'errors-only' }}
+    secrets: inherit
