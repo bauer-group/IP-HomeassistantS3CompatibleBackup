@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import cast
 
@@ -30,6 +31,34 @@ type S3CompatibleConfigEntry = ConfigEntry[BotoClient]
 _LOGGER = logging.getLogger(__name__)
 
 
+def _verify_s3_credentials(
+    endpoint_url: str | None,
+    access_key: str,
+    secret_key: str,
+    region: str,
+    bucket: str,
+) -> None:
+    """Verify S3 credentials in executor to avoid blocking the event loop.
+
+    This creates a temporary client in a separate thread with its own event loop.
+    All blocking operations (botocore data loading, SSL certificate loading)
+    happen here, warming the OS-level caches for subsequent client creation.
+    """
+
+    async def _verify() -> None:
+        session = AioSession()
+        async with session.create_client(
+            "s3",
+            endpoint_url=endpoint_url,
+            aws_secret_access_key=secret_key,
+            aws_access_key_id=access_key,
+            region_name=region,
+        ) as client:
+            await client.head_bucket(Bucket=bucket)
+
+    asyncio.run(_verify())
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: S3CompatibleConfigEntry) -> bool:
     """Set up S3 Compatible Backup from a config entry."""
 
@@ -37,6 +66,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: S3CompatibleConfigEntry)
     region = data.get(CONF_REGION, DEFAULT_REGION)
 
     try:
+        # Verify credentials in executor to avoid blocking the event loop
+        # with botocore's synchronous I/O operations (listdir, file reads, SSL loading)
+        await hass.async_add_executor_job(
+            _verify_s3_credentials,
+            data.get(CONF_ENDPOINT_URL),
+            data[CONF_ACCESS_KEY_ID],
+            data[CONF_SECRET_ACCESS_KEY],
+            region,
+            data[CONF_BUCKET],
+        )
+
+        # Create the actual client for runtime use
+        # OS-level caches are now warm from the verification step
         session = AioSession()
         # pylint: disable-next=unnecessary-dunder-call
         client = await session.create_client(
@@ -46,7 +88,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: S3CompatibleConfigEntry)
             aws_access_key_id=data[CONF_ACCESS_KEY_ID],
             region_name=region,
         ).__aenter__()
-        await client.head_bucket(Bucket=data[CONF_BUCKET])
     except ClientError as err:
         raise ConfigEntryAuthFailed(
             translation_domain=DOMAIN,

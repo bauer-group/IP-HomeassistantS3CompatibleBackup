@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Mapping
 from typing import Any
 
@@ -28,6 +29,36 @@ from .const import (
     DEFAULT_REGION,
     DOMAIN,
 )
+
+
+def _validate_s3_credentials(
+    endpoint_url: str,
+    access_key: str,
+    secret_key: str,
+    region: str,
+    bucket: str,
+) -> None:
+    """Validate S3 credentials in executor to avoid blocking the event loop.
+
+    This creates a temporary client in a separate thread with its own event loop.
+    All blocking operations (botocore data loading, SSL certificate loading)
+    happen here instead of blocking the main event loop.
+
+    Raises exceptions if validation fails (ClientError, ConnectionError, etc.)
+    """
+
+    async def _validate() -> None:
+        session = AioSession()
+        async with session.create_client(
+            "s3",
+            endpoint_url=endpoint_url,
+            aws_secret_access_key=secret_key,
+            aws_access_key_id=access_key,
+            region_name=region,
+        ) as client:
+            await client.head_bucket(Bucket=bucket)
+
+    asyncio.run(_validate())
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
@@ -92,15 +123,15 @@ class S3CompatibleConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
             try:
-                session = AioSession()
-                async with session.create_client(
-                    "s3",
-                    endpoint_url=user_input[CONF_ENDPOINT_URL],
-                    aws_secret_access_key=user_input[CONF_SECRET_ACCESS_KEY],
-                    aws_access_key_id=user_input[CONF_ACCESS_KEY_ID],
-                    region_name=user_input.get(CONF_REGION, DEFAULT_REGION),
-                ) as client:
-                    await client.head_bucket(Bucket=user_input[CONF_BUCKET])
+                # Validate credentials in executor to avoid blocking the event loop
+                await self.hass.async_add_executor_job(
+                    _validate_s3_credentials,
+                    user_input[CONF_ENDPOINT_URL],
+                    user_input[CONF_ACCESS_KEY_ID],
+                    user_input[CONF_SECRET_ACCESS_KEY],
+                    user_input.get(CONF_REGION, DEFAULT_REGION),
+                    user_input[CONF_BUCKET],
+                )
             except ClientError:
                 errors["base"] = "invalid_credentials"
             except ParamValidationError as err:
@@ -141,15 +172,15 @@ class S3CompatibleConfigFlow(ConfigFlow, domain=DOMAIN):
             entry_data = self._reauth_entry.data
 
             try:
-                session = AioSession()
-                async with session.create_client(
-                    "s3",
-                    endpoint_url=entry_data[CONF_ENDPOINT_URL],
-                    aws_secret_access_key=user_input[CONF_SECRET_ACCESS_KEY],
-                    aws_access_key_id=user_input[CONF_ACCESS_KEY_ID],
-                    region_name=entry_data.get(CONF_REGION, DEFAULT_REGION),
-                ) as client:
-                    await client.head_bucket(Bucket=entry_data[CONF_BUCKET])
+                # Validate credentials in executor to avoid blocking the event loop
+                await self.hass.async_add_executor_job(
+                    _validate_s3_credentials,
+                    entry_data[CONF_ENDPOINT_URL],
+                    user_input[CONF_ACCESS_KEY_ID],
+                    user_input[CONF_SECRET_ACCESS_KEY],
+                    entry_data.get(CONF_REGION, DEFAULT_REGION),
+                    entry_data[CONF_BUCKET],
+                )
             except ClientError:
                 errors["base"] = "invalid_credentials"
             except ConnectionError:
@@ -191,15 +222,15 @@ class S3CompatibleConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
             try:
-                session = AioSession()
-                async with session.create_client(
-                    "s3",
-                    endpoint_url=user_input[CONF_ENDPOINT_URL],
-                    aws_secret_access_key=user_input[CONF_SECRET_ACCESS_KEY],
-                    aws_access_key_id=user_input[CONF_ACCESS_KEY_ID],
-                    region_name=user_input.get(CONF_REGION, DEFAULT_REGION),
-                ) as client:
-                    await client.head_bucket(Bucket=user_input[CONF_BUCKET])
+                # Validate credentials in executor to avoid blocking the event loop
+                await self.hass.async_add_executor_job(
+                    _validate_s3_credentials,
+                    user_input[CONF_ENDPOINT_URL],
+                    user_input[CONF_ACCESS_KEY_ID],
+                    user_input[CONF_SECRET_ACCESS_KEY],
+                    user_input.get(CONF_REGION, DEFAULT_REGION),
+                    user_input[CONF_BUCKET],
+                )
             except ClientError:
                 errors["base"] = "invalid_credentials"
             except ParamValidationError as err:
