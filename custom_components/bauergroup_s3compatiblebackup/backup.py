@@ -18,7 +18,7 @@ from homeassistant.components.backup import (
 )
 from homeassistant.core import HomeAssistant, callback
 
-from . import S3CompatibleConfigEntry
+from . import S3ClientWrapper, S3CompatibleConfigEntry
 from .const import (
     BACKUP_FOLDER,
     CONF_BUCKET,
@@ -100,7 +100,7 @@ class S3CompatibleBackupAgent(BackupAgent):
     def __init__(self, hass: HomeAssistant, entry: S3CompatibleConfigEntry) -> None:
         """Initialize the S3 backup agent."""
         super().__init__()
-        self._client = entry.runtime_data
+        self._client: S3ClientWrapper = entry.runtime_data
         self._bucket: str = entry.data[CONF_BUCKET]
         self._prefix: str = self._build_prefix(entry.data.get(CONF_PREFIX, DEFAULT_PREFIX))
         self.name = entry.title

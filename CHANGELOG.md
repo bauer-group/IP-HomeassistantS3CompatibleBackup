@@ -5,11 +5,23 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.1.5] - 2026-01-13
+
+### 🐛 Fixed
+
+- **Blocking Call Warnungen vollständig behoben**
+  - Neuer `S3ClientWrapper` führt alle S3-Operationen in dediziertem Worker-Thread aus
+  - Behebt alle `Detected blocking call` Warnungen (`listdir`, `open`, `load_verify_locations`)
+  - Vorherige Lösung (0.1.4) war unzureichend, da jede AioSession eigenen Loader-Cache hat
+  - Worker-Thread mit eigenem Event-Loop vermeidet Blockierung des Home Assistant Event-Loops
+
+---
+
 ## [0.1.4] - 2026-01-12
 
 ### 🐛 Fixed
 
-- **Blocking Call Warnungen behoben**
+- **Blocking Call Warnungen behoben** (teilweise - siehe 0.1.5)
   - S3-Client-Erstellung und Validierung erfolgt nun in einem Executor-Thread
   - Behebt `Detected blocking call to listdir` und ähnliche Warnungen in Home Assistant
   - Betrifft botocore's synchrone I/O-Operationen (listdir, Datei-Lese, SSL-Zertifikat-Laden)
