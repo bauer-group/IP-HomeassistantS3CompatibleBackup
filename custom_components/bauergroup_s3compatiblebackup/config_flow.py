@@ -30,6 +30,11 @@ from .const import (
     DOMAIN,
 )
 
+ENDPOINT_URL_PLACEHOLDERS = {
+    "example_aws_url": "https://s3.eu-central-1.amazonaws.com",
+    "example_minio_url": "https://your-minio-server:9000",
+}
+
 
 def _validate_s3_credentials(
     endpoint_url: str,
@@ -152,6 +157,7 @@ class S3CompatibleConfigFlow(ConfigFlow, domain=DOMAIN):
                 STEP_USER_DATA_SCHEMA, user_input
             ),
             errors=errors,
+            description_placeholders=ENDPOINT_URL_PLACEHOLDERS,
         )
 
     async def async_step_reauth(
@@ -253,4 +259,5 @@ class S3CompatibleConfigFlow(ConfigFlow, domain=DOMAIN):
                 STEP_RECONFIGURE_DATA_SCHEMA, reconfigure_entry.data
             ),
             errors=errors,
+            description_placeholders=ENDPOINT_URL_PLACEHOLDERS,
         )
