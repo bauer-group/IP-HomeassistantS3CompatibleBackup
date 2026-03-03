@@ -5,6 +5,18 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.1.6] - 2026-03-03
+
+### 🐛 Fixed
+
+- **"Future attached to a different loop" Fehler behoben** ([#3](https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/issues/3))
+  - `async_list_backups()` schlug fehl, weil der aiohttp-Response-Body-Stream an den Worker-Thread-Event-Loop gebunden war, aber im Home Assistant Event-Loop gelesen wurde
+  - Neue Methode `get_object_body()` liest den gesamten Body im Worker-Thread (für kleine Objekte wie Metadaten-JSON)
+  - Neue Methode `get_object_stream()` streamt Body-Chunks über eine thread-sichere Queue zwischen Worker- und Main-Event-Loop (für große Backup-Dateien)
+  - Behebt auch einen latenten Fehler in `async_download_backup()`, der beim Wiederherstellen von Backups aufgetreten wäre
+
+---
+
 ## [0.1.5] - 2026-01-13
 
 ### 🐛 Fixed

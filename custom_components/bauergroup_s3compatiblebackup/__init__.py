@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import AsyncIterator
+from queue import Queue
 from threading import Thread
 from typing import Any, cast
 
@@ -139,6 +141,52 @@ class S3ClientWrapper:
     async def get_object(self, **kwargs: Any) -> dict[str, Any]:
         """Get an object from a bucket."""
         return await self._dispatch(self._client.get_object(**kwargs))
+
+    async def get_object_body(self, **kwargs: Any) -> bytes:
+        """Get an object and read its full body in the worker thread.
+
+        This avoids the 'Future attached to a different loop' error that occurs
+        when trying to read a response body stream from a different event loop.
+        Use this for small objects (e.g., metadata JSON files).
+        """
+
+        async def _get_and_read() -> bytes:
+            response = await self._client.get_object(**kwargs)
+            return await response["Body"].read()
+
+        return await self._dispatch(_get_and_read())
+
+    async def get_object_stream(self, **kwargs: Any) -> AsyncIterator[bytes]:
+        """Get an object and stream its body from the worker thread.
+
+        Uses a thread-safe queue to bridge the worker thread's event loop
+        and the caller's event loop for streaming large objects (e.g., backups).
+        """
+        data_queue: Queue[bytes | None] = Queue()
+        error_holder: list[BaseException | None] = [None]
+
+        async def _stream_body() -> None:
+            try:
+                response = await self._client.get_object(**kwargs)
+                async for chunk in response["Body"].iter_chunks():
+                    data_queue.put(chunk)
+            except BaseException as exc:
+                error_holder[0] = exc
+            finally:
+                data_queue.put(None)  # Sentinel to signal completion
+
+        if self._loop is None:
+            raise RuntimeError("Worker loop not started")
+        asyncio.run_coroutine_threadsafe(_stream_body(), self._loop)
+
+        loop = asyncio.get_running_loop()
+        while True:
+            chunk = await loop.run_in_executor(None, data_queue.get)
+            if chunk is None:
+                if error_holder[0] is not None:
+                    raise error_holder[0]
+                break
+            yield chunk
 
     async def put_object(self, **kwargs: Any) -> dict[str, Any]:
         """Put an object into a bucket."""

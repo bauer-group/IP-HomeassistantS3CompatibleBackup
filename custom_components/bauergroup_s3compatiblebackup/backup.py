@@ -148,10 +148,9 @@ class S3CompatibleBackupAgent(BackupAgent):
         backup = await self._find_backup_by_id(backup_id)
         tar_filename, _ = suggested_filenames(backup)
 
-        response = await self._client.get_object(
+        return self._client.get_object_stream(
             Bucket=self._bucket, Key=self._get_key(tar_filename)
         )
-        return response["Body"].iter_chunks()
 
     async def async_upload_backup(
         self,
@@ -363,10 +362,11 @@ class S3CompatibleBackupAgent(BackupAgent):
             for metadata_file in metadata_files:
                 try:
                     # Download and parse metadata file
-                    metadata_response = await self._client.get_object(
+                    # Use get_object_body to read entirely in the worker thread,
+                    # avoiding 'Future attached to a different loop' errors
+                    metadata_content = await self._client.get_object_body(
                         Bucket=self._bucket, Key=metadata_file["Key"]
                     )
-                    metadata_content = await metadata_response["Body"].read()
                     metadata_json = json.loads(metadata_content)
                 except (BotoCoreError, json.JSONDecodeError) as err:
                     _LOGGER.warning(
