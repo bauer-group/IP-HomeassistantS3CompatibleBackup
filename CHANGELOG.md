@@ -5,6 +5,16 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.1.7] - 2026-03-03
+
+### 🐛 Fixed
+
+- **Hassfest URL-Validierung behoben**
+  - URLs in Übersetzungs-Strings durch `description_placeholders` ersetzt
+  - Hassfest verbietet direkte URLs in Übersetzungs-Strings
+
+---
+
 ## [0.1.6] - 2026-03-03
 
 ### 🐛 Fixed
