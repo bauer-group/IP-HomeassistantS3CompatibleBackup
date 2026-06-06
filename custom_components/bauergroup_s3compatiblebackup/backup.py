@@ -136,7 +136,7 @@ class S3CompatibleBackupAgent(BackupAgent):
         """
         return f"{self._prefix}{filename}"
 
-    def _upload_options(self) -> dict[str, str]:
+    def _upload_options(self) -> dict[str, Any]:
         """Build optional upload options for put/create multipart operations."""
         if not self._storage_class:
             return {}
