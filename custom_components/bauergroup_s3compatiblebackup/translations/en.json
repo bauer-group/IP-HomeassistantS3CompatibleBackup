@@ -10,7 +10,8 @@
           "bucket": "Bucket Name",
           "endpoint_url": "Endpoint URL",
           "region": "Region",
-          "prefix": "Storage Prefix"
+          "prefix": "Storage Prefix",
+          "storage_class": "Storage Class"
         },
         "data_description": {
           "access_key_id": "The access key ID for your S3 compatible storage.",
@@ -18,7 +19,8 @@
           "bucket": "The bucket name where backups will be stored. The bucket must already exist and be writable.",
           "endpoint_url": "The endpoint URL of your S3 compatible storage (e.g., {example_aws_url} or {example_minio_url}).",
           "region": "The region of your S3 compatible storage (e.g., us-east-1, eu-central-1).",
-          "prefix": "The root folder for backups in the bucket. Backups will be stored in {prefix}/backups/. Default: homeassistant"
+          "prefix": "The root folder for backups in the bucket. Backups will be stored in {prefix}/backups/. Default: homeassistant",
+          "storage_class": "Optional storage class used for uploads (for example STANDARD, STANDARD_IA, GLACIER)."
         }
       }
     },
