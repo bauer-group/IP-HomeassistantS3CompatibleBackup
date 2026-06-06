@@ -23,6 +23,7 @@ from .const import (
     BACKUP_FOLDER,
     CONF_BUCKET,
     CONF_PREFIX,
+    CONF_STORAGE_CLASS,
     DATA_BACKUP_AGENT_LISTENERS,
     DEFAULT_PREFIX,
     DOMAIN,
@@ -103,6 +104,7 @@ class S3CompatibleBackupAgent(BackupAgent):
         self._client: S3ClientWrapper = entry.runtime_data
         self._bucket: str = entry.data[CONF_BUCKET]
         self._prefix: str = self._build_prefix(entry.data.get(CONF_PREFIX, DEFAULT_PREFIX))
+        self._storage_class: str | None = entry.data.get(CONF_STORAGE_CLASS)
         self.name = entry.title
         self.unique_id = entry.entry_id
         self._backup_cache: dict[str, AgentBackup] = {}
@@ -133,6 +135,12 @@ class S3CompatibleBackupAgent(BackupAgent):
             Full S3 key (e.g., 'homeassistant/backups/backup.tar')
         """
         return f"{self._prefix}{filename}"
+
+    def _upload_options(self) -> dict[str, str]:
+        """Build optional upload options for put/create multipart operations."""
+        if not self._storage_class:
+            return {}
+        return {"StorageClass": self._storage_class}
 
     @handle_boto_errors
     async def async_download_backup(
@@ -180,6 +188,7 @@ class S3CompatibleBackupAgent(BackupAgent):
                 Bucket=self._bucket,
                 Key=metadata_key,
                 Body=metadata_content,
+                **self._upload_options(),
             )
         except BotoCoreError as err:
             raise BackupAgentError("Failed to upload backup") from err
@@ -207,6 +216,7 @@ class S3CompatibleBackupAgent(BackupAgent):
             Bucket=self._bucket,
             Key=key,
             Body=bytes(file_data),
+            **self._upload_options(),
         )
 
     async def _upload_multipart(
@@ -223,6 +233,7 @@ class S3CompatibleBackupAgent(BackupAgent):
         multipart_upload = await self._client.create_multipart_upload(
             Bucket=self._bucket,
             Key=key,
+            **self._upload_options(),
         )
         upload_id = multipart_upload["UploadId"]
         try:

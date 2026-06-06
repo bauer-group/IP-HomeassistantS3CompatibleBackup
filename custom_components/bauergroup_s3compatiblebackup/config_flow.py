@@ -25,6 +25,7 @@ from .const import (
     CONF_PREFIX,
     CONF_REGION,
     CONF_SECRET_ACCESS_KEY,
+    CONF_STORAGE_CLASS,
     DEFAULT_PREFIX,
     DEFAULT_REGION,
     DOMAIN,
@@ -77,6 +78,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         ),
         vol.Required(CONF_REGION, default=DEFAULT_REGION): cv.string,
         vol.Optional(CONF_PREFIX, default=DEFAULT_PREFIX): cv.string,
+        vol.Optional(CONF_STORAGE_CLASS): cv.string,
     }
 )
 
@@ -101,6 +103,7 @@ STEP_RECONFIGURE_DATA_SCHEMA = vol.Schema(
         ),
         vol.Required(CONF_REGION): cv.string,
         vol.Optional(CONF_PREFIX): cv.string,
+        vol.Optional(CONF_STORAGE_CLASS): cv.string,
     }
 )
 
