@@ -5,6 +5,27 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.2.0] - 2026-06-16
+
+### ✨ Added
+
+- **Konfigurierbare S3 Storage-Klasse** ([#4](https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/pull/4))
+  - Neue optionale Einstellung "Storage-Klasse" im Setup- und im Reconfigure-Flow
+  - Wird als `StorageClass` an `put_object` und `create_multipart_upload` übergeben
+  - Ermöglicht die Wahl der Speicherstufe (z.B. `STANDARD`, `STANDARD_IA`, `GLACIER`)
+  - Freitext statt fester Auswahlliste, da S3-kompatible Anbieter (MinIO, Wasabi, Backblaze B2) abweichende Klassennamen verwenden
+  - Bleibt das Feld leer, wird keine Storage-Klasse gesendet und der Anbieter-Standard greift
+  - Beitrag von [@wardpieters](https://github.com/wardpieters)
+
+### 🐛 Fixed
+
+- **Fehlende Übersetzungen für Reauth- und Reconfigure-Flow ergänzt** ([#5](https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/issues/5))
+  - `en.json` und `de.json` enthielten bisher nur den `user`-Schritt
+  - Die Schritte `reauth_confirm` und `reconfigure` fielen auf die `strings.json`-Quelle zurück, statt lokalisierte Labels anzuzeigen
+  - Beide Schritte sowie die Meldung `abort.reauth_successful` sind nun vollständig in Deutsch und Englisch übersetzt
+
+---
+
 ## [0.1.7] - 2026-03-03
 
 ### 🐛 Fixed
