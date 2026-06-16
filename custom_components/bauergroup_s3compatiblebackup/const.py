@@ -13,6 +13,7 @@ CONF_ENDPOINT_URL = "endpoint_url"
 CONF_BUCKET = "bucket"
 CONF_REGION = "region"
 CONF_PREFIX = "prefix"
+CONF_STORAGE_CLASS = "storage_class"
 
 DEFAULT_REGION = "us-east-1"
 DEFAULT_PREFIX = "homeassistant"
