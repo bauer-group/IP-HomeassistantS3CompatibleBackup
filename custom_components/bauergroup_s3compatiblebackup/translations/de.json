@@ -22,6 +22,40 @@
           "prefix": "Der Stammordner für Backups im Bucket. Backups werden unter {prefix}/backups/ gespeichert. Standard: homeassistant",
           "storage_class": "Optionale Storage-Klasse für Uploads (z.B. STANDARD, STANDARD_IA, GLACIER)."
         }
+      },
+      "reauth_confirm": {
+        "title": "S3-Speicher neu authentifizieren",
+        "description": "Die Anmeldedaten für {bucket} sind nicht mehr gültig. Bitte geben Sie neue Anmeldedaten ein.",
+        "data": {
+          "access_key_id": "Access Key ID",
+          "secret_access_key": "Secret Access Key"
+        },
+        "data_description": {
+          "access_key_id": "Die neue Access Key ID für Ihren S3-kompatiblen Speicher.",
+          "secret_access_key": "Der neue Secret Access Key für Ihren S3-kompatiblen Speicher."
+        }
+      },
+      "reconfigure": {
+        "title": "S3-Speicher neu konfigurieren",
+        "description": "Aktualisieren Sie die Konfiguration für Ihren S3-kompatiblen Speicher.",
+        "data": {
+          "access_key_id": "Access Key ID",
+          "secret_access_key": "Secret Access Key",
+          "bucket": "Bucket-Name",
+          "endpoint_url": "Endpoint-URL",
+          "region": "Region",
+          "prefix": "Speicher-Präfix",
+          "storage_class": "Storage-Klasse"
+        },
+        "data_description": {
+          "access_key_id": "Die Access Key ID für Ihren S3-kompatiblen Speicher.",
+          "secret_access_key": "Der Secret Access Key für Ihren S3-kompatiblen Speicher.",
+          "bucket": "Der Bucket-Name, in dem Backups gespeichert werden. Der Bucket muss bereits existieren und beschreibbar sein.",
+          "endpoint_url": "Die Endpoint-URL Ihres S3-kompatiblen Speichers (z.B. {example_aws_url} oder {example_minio_url}).",
+          "region": "Die Region Ihres S3-kompatiblen Speichers (z.B. us-east-1, eu-central-1).",
+          "prefix": "Der Stammordner für Backups im Bucket. Backups werden unter {prefix}/backups/ gespeichert. Standard: homeassistant",
+          "storage_class": "Optionale Storage-Klasse für Uploads (z.B. STANDARD, STANDARD_IA, GLACIER)."
+        }
       }
     },
     "error": {
@@ -31,7 +65,8 @@
       "invalid_endpoint_url": "Ungültige Endpoint-URL. Bitte geben Sie eine gültige URL an."
     },
     "abort": {
-      "already_configured": "Diese Bucket- und Endpoint-Kombination ist bereits konfiguriert."
+      "already_configured": "Diese Bucket- und Endpoint-Kombination ist bereits konfiguriert.",
+      "reauth_successful": "Die erneute Authentifizierung war erfolgreich."
     }
   },
   "exceptions": {
