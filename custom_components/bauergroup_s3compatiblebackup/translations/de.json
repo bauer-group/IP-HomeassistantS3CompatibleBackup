@@ -19,7 +19,7 @@
           "bucket": "Der Bucket-Name, in dem Backups gespeichert werden. Der Bucket muss bereits existieren und beschreibbar sein.",
           "endpoint_url": "Die Endpoint-URL Ihres S3-kompatiblen Speichers (z.B. {example_aws_url} oder {example_minio_url}).",
           "region": "Die Region Ihres S3-kompatiblen Speichers (z.B. us-east-1, eu-central-1).",
-          "prefix": "Der Stammordner für Backups im Bucket. Backups werden unter {prefix}/backups/ gespeichert. Standard: homeassistant",
+          "prefix": "Der Stammordner für Backups im Bucket. Backups werden unter '{prefix}'/backups/ gespeichert. Standard: homeassistant",
           "storage_class": "Optionale Storage-Klasse für Uploads (z.B. STANDARD, STANDARD_IA, GLACIER)."
         }
       },
@@ -53,7 +53,7 @@
           "bucket": "Der Bucket-Name, in dem Backups gespeichert werden. Der Bucket muss bereits existieren und beschreibbar sein.",
           "endpoint_url": "Die Endpoint-URL Ihres S3-kompatiblen Speichers (z.B. {example_aws_url} oder {example_minio_url}).",
           "region": "Die Region Ihres S3-kompatiblen Speichers (z.B. us-east-1, eu-central-1).",
-          "prefix": "Der Stammordner für Backups im Bucket. Backups werden unter {prefix}/backups/ gespeichert. Standard: homeassistant",
+          "prefix": "Der Stammordner für Backups im Bucket. Backups werden unter '{prefix}'/backups/ gespeichert. Standard: homeassistant",
           "storage_class": "Optionale Storage-Klasse für Uploads (z.B. STANDARD, STANDARD_IA, GLACIER)."
         }
       }
