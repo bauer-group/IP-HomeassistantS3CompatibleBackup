@@ -5,7 +5,7 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
-## [0.2.1] - 2026-06-18
+## [0.2.2] - 2026-06-18
 
 ### 🐛 Fixed
 
@@ -13,8 +13,19 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
   - Die `data_description` des Felds `prefix` enthielt ein wörtlich gemeintes `{prefix}`, das vom Home-Assistant-Frontend (formatjs/ICU MessageFormat) als Platzhalter-Variable interpretiert wurde
   - Da kein `prefix`-Platzhalter über `description_placeholders` bereitgestellt wird, warf das Rendering `MISSING_VALUE`
   - Der Fehler führte zusätzlich dazu, dass das benachbarte Label `storage_class` auf seinen Roh-Key zurückfiel, statt übersetzt zu werden
-  - `{prefix}` wird nun via ICU-Escape (`'{prefix}'`) als Literal gerendert — angezeigter Text bleibt unverändert
+  - Die Beschreibung wurde ohne geschweifte Klammern umformuliert, sodass kein Platzhalter mehr interpretiert wird
   - Betrifft `strings.json`, `translations/en.json` und `translations/de.json`
+  - **Hinweis:** Ersetzt den fehlerhaften Fix aus 0.2.1, der den ICU-Escape `'{prefix}'` verwendete und an der Hassfest-Validierung scheiterte (Platzhalter in einfachen Anführungszeichen sind nicht erlaubt)
+
+---
+
+## [0.2.1] - 2026-06-18
+
+### 🐛 Fixed
+
+- **Fehlerhafter Fix für den `prefix`-formatjs-Fehler (zurückgezogen)**
+  - Verwendete den ICU-Escape `'{prefix}'`, der zur Laufzeit zwar korrekt rendert, aber von Hassfest abgelehnt wird (`placeholders inside single quotes`)
+  - Vollständig behoben in 0.2.2
 
 ---
 
