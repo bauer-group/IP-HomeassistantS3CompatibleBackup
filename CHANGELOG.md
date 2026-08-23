@@ -5,15 +5,30 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
-## [0.2.3] - 2026-08-10
+## [0.2.3] - 2026-08-23
 
 ### 🐛 Fixed
 
-- **Setup schlug mit `Requirements ... not found: aiobotocore` fehl**
-  - Die Anforderung war auf `aiobotocore>=2.6.0,<3.0.0` begrenzt
-  - `aiobotocore` hat sein Versionsschema geändert, um mit den schnelleren `botocore`-Releases Schritt zu halten, und veröffentlicht seit `3.0.0` keine `2.x`-Releases mehr, die zu aktuellen `botocore`-Versionen passen
-  - Dadurch konnte der Dependency-Resolver (`uv`/`pip`) keine Version mehr finden, die sowohl die Obergrenze `<3.0.0` als auch die von der Umgebung vorgegebene `botocore`-Version erfüllt
-  - Obergrenze auf `<4.0.0` angehoben; die verwendete API (`AioSession`, `session.create_client`) ist zwischen `aiobotocore` 2.x und 3.x unverändert
+- **Setup schlug unter Home Assistant Core 2026.8 mit `Requirements ... not found` fehl** ([#6](https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/issues/6), [#7](https://github.com/bauer-group/IP-HomeassistantS3CompatibleBackup/pull/7))
+  - Fehlerbild beim Start: `Setup failed for custom integration 'bauergroup_s3compatiblebackup': Requirements for bauergroup_s3compatiblebackup not found: ['aiobotocore>=2.6.0,<3.0.0']`
+  - Ursache war die Versionsobergrenze `<3.0.0` in `manifest.json`, nicht die Integration selbst
+  - `aiobotocore` hat sein Versionsschema an die Release-Kadenz von `botocore` angeglichen: Auf `2.26.0` (November 2025) folgte direkt `3.0.0` (Dezember 2025); seitdem erscheinen keine `2.x`-Releases mehr, die zu aktuellen `botocore`-Versionen passen
+  - Home Assistant Core hat diesen Sprung in 2026.8.0 nachvollzogen und die selbst mitgelieferte Abhängigkeit von `aiobotocore==2.21.1` (noch in 2026.7.x) auf `aiobotocore==3.7.0` angehoben — zusätzlich wird seither `botocore==1.42.97` in `package_constraints.txt` fest gepinnt, damit eine Requirement-Installation keine unpassende `botocore`-Version nachziehen kann
+  - Die von Home Assistant bereitgestellte `3.7.0` erfüllte unsere Obergrenze `<3.0.0` nicht mehr, und der daraufhin ausgelöste Nachinstallations-Versuch scheiterte am `botocore`-Pin — der Resolver meldete die Anforderung als unerfüllbar (die lange Fehlerausgabe im Log stammt von `uv`)
+  - Obergrenze auf `<4.0.0` angehoben: Damit erfüllt die von Home Assistant bereitgestellte Version die Anforderung direkt und es wird gar kein Installationsversuch mehr ausgelöst
+  - Betroffen waren alle Installationen ab Home Assistant Core 2026.8.0; unter 2026.7.x und älter trat der Fehler nicht auf
+  - Gemeldet von [@Sergey842248](https://github.com/Sergey842248); Analyse und Beitrag von [@actuallychris](https://github.com/actuallychris)
+
+### 🔧 Technical
+
+- Abhängigkeit: `aiobotocore>=2.6.0,<4.0.0` (zuvor `>=2.6.0,<3.0.0`)
+- Die Untergrenze `>=2.6.0` bleibt bestehen, sodass ältere Home-Assistant-Versionen mit `aiobotocore` 2.x weiterhin unterstützt werden
+- Reine Anpassung der Versionsobergrenze — am Integrationscode war keine Änderung nötig, da die genutzte API über die Grenze 2.x → 3.x unverändert ist (`AioSession`, `session.create_client`, `__aenter__`/`__aexit__`, `StreamingBody.read()` / `iter_chunks()`)
+- Die Breaking Changes der 3.x-Reihe betreffen diese Integration nicht:
+  - `3.0.0` untersagt das Anlegen loser `ClientSession`-Objekte, nachdem ein `AioBaseClient` seinen Kontext verlassen hat — der Client wird hier explizit über `__aenter__()` betreten, über `__aexit__()` geschlossen und danach nicht weiterverwendet
+  - `3.8.0` ändert `AioStreamingBody.__aenter__` (liefert `self` statt der rohen `aiohttp`-`ClientResponse`) — der Response-Body wird hier ausschließlich über `read()` und `iter_chunks()` gelesen, nie als Kontextmanager verwendet
+
+---
 
 ## [0.2.2] - 2026-06-18
 
