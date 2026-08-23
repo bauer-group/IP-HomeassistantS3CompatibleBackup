@@ -5,6 +5,16 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.2.3] - 2026-08-10
+
+### 🐛 Fixed
+
+- **Setup schlug mit `Requirements ... not found: aiobotocore` fehl**
+  - Die Anforderung war auf `aiobotocore>=2.6.0,<3.0.0` begrenzt
+  - `aiobotocore` hat sein Versionsschema geändert, um mit den schnelleren `botocore`-Releases Schritt zu halten, und veröffentlicht seit `3.0.0` keine `2.x`-Releases mehr, die zu aktuellen `botocore`-Versionen passen
+  - Dadurch konnte der Dependency-Resolver (`uv`/`pip`) keine Version mehr finden, die sowohl die Obergrenze `<3.0.0` als auch die von der Umgebung vorgegebene `botocore`-Version erfüllt
+  - Obergrenze auf `<4.0.0` angehoben; die verwendete API (`AioSession`, `session.create_client`) ist zwischen `aiobotocore` 2.x und 3.x unverändert
+
 ## [0.2.2] - 2026-06-18
 
 ### 🐛 Fixed
